@@ -535,29 +535,3 @@ extern void rb_free(struct rb_node* node){
 	free(node->key);
 	free(node);
 }
-
-
-// int main(int argc, char *argv[]){
-	
-// 	struct rb_tree* tree;
-// 	struct rb_node* node;
-	
-// 	tree = rb_tree_alloc();
-
-// 	node = rb_node_alloc_kv("1", "1");
-// 	rb_insert(tree, node);
-// 	node = rb_node_alloc_kv("2", "2");
-// 	rb_insert(tree, node);
-// 	node = rb_node_alloc_kv("3", "3");
-// 	rb_insert(tree, node);
-// 	__LIST_KEYS_SORTED(tree->root);
-
-// 	delete(tree, "2");
-
-// 	delete(tree, "1");
-// 	delete(tree, "3");
-	
-// 	__LIST_KEYS_SORTED(tree->root);
-
-// 	return 0;
-// }

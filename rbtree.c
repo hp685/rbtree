@@ -235,6 +235,8 @@ extern struct rb_node* rb_delete(struct rb_tree* tree, struct rb_node* node){
 	else { /* node has two children that are not sentinel*/
 		
 		y = tree_minimum(node->right);
+		printf("rb_delete tree minimum\n");
+		__PRINT_NODE(y);
 		y_original_color = y->color;
 		x = y->right;
 
@@ -506,7 +508,7 @@ extern void set(struct rb_tree *tree, char *key, char* data){
 extern bool delete(struct rb_tree *tree, char *key){
 
 	struct rb_node *candidate = rb_search(tree, key);
-	
+	__PRINT_NODE(candidate);
 	if (candidate != SENTINEL()){
 		rb_delete(tree, candidate);
 		rb_free(candidate);
@@ -528,10 +530,49 @@ extern bool is_member(struct rb_tree* tree, char* key){
 }
 
 
-
 extern void rb_free(struct rb_node* node){
 
 	free(node->data);
 	free(node->key);
 	free(node);
+}
+
+
+void _print_tree_recursive(struct rb_node* node){
+	if (!node)
+		return;
+	__PRINT_NODE(node);
+	_print_tree_recursive(node->left);
+	_print_tree_recursive(node->right);
+}
+
+void _print_tree(struct rb_tree* tree){
+	_print_tree_recursive(tree->root);
+
+}
+
+int main(int argc, char const *argv[])
+{
+	struct rb_tree *tree = rb_tree_alloc();
+	struct rb_node *node;
+	char s[2];
+	s[1] = '\0';
+	for(char c = 'a'; c <= 'z'; ++c){
+		s[0] = c;
+		node = rb_node_alloc_kv(s, s);
+		rb_insert(tree, node);
+	}
+
+	_print_tree(tree);
+
+	char* delete_set[] = {"a", "h", "i", "t", "u", "n"};
+	for (int i = 0; i < 6; i++)
+	{
+		printf("%s\n", delete_set[i]);
+		if (delete(tree, delete_set[i])){
+			_print_tree(tree);
+			node = rb_search(tree, delete_set[i]);
+		}
+	}
+	return 0;
 }

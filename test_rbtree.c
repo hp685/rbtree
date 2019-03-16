@@ -66,10 +66,9 @@ void test_insert_and_delete(){
 	char* delete_set[] = {"a", "h", "i", "t", "u", "n"};
 	for (int i = 0; i < 6; i++)
 	{
-		printf("%s\n", delete_set[i]);
 		if (delete(tree, delete_set[i])){
 			node = rb_search(tree, delete_set[i]);
-			TEST_ASSERT_EQUAL(node, NULL);
+			TEST_ASSERT_EQUAL(node, tree->root->parent);
 		}
 	}
 }

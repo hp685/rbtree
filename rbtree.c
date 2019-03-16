@@ -1,4 +1,4 @@
-/* Red Black Tree implementation based on CLRS 3rd edition.
+/* 
    
    Properties:
    1. Every node is R or B
@@ -6,12 +6,16 @@
    3. Every leaf (sentinel node) is B.
    4. If a node is R, then both its children are B.
    5. All simple paths from node to leaf contain the same number of B nodes.
-
+   
+***IMPORTANT***
    Implementation notes:
    1. Root's parent is sentinel node, if root is a node. 
    2. Leaf nodes are also sentinel node. 
    3. All RB Tree instances will share this sentinel node for their root's parent and leaves.
    4. Empty root is initialized to sentinel.
+   5. Unsuccessful search (rb_search)  always returns the sentinel node. 
+   
+   Implementation based on CLRS 3rd edition.
 */
 
 #include <stdio.h>
@@ -153,7 +157,7 @@ void rb_insert_fixup(struct rb_tree* tree, struct rb_node* node){
 
 	struct rb_node* y;
 
-	while (node->parent->color == RED){
+	while (node->parent != SENTINEL() && node->parent->color == RED){
 		if (node->parent == node->parent->parent->left){
 			y = node->parent->parent->right;
 			/*case 1: node's uncle y is red*/
@@ -185,15 +189,18 @@ void rb_insert_fixup(struct rb_tree* tree, struct rb_node* node){
 				node->parent->color = BLACK;
 				y->color = BLACK;
 				node->parent->parent->color = RED;
+				node = node->parent->parent;
 			}/*case 2*/
-			else if (node == node->parent->left){
+			else {
+			  if (node == node->parent->left){
 				node = node->parent;
 				right_rotate(tree, node);
-			}
+			  }
 			/*case 3*/
-			node->parent->color = BLACK;
-			node->parent->parent->color = RED;
-			left_rotate(tree, node->parent->parent);
+			  node->parent->color = BLACK;
+			  node->parent->parent->color = RED;
+			  left_rotate(tree, node->parent->parent);
+			}
 		}
 		
 	}
@@ -235,8 +242,6 @@ extern struct rb_node* rb_delete(struct rb_tree* tree, struct rb_node* node){
 	else { /* node has two children that are not sentinel*/
 		
 		y = tree_minimum(node->right);
-		printf("rb_delete tree minimum\n");
-		__PRINT_NODE(y);
 		y_original_color = y->color;
 		x = y->right;
 
@@ -286,6 +291,7 @@ void rb_delete_fixup(struct rb_tree *tree, struct rb_node *node){
 			/*case 2: node's sibling is black and both of siblings children are black
 			  Mark the sibling red and the new node is now the parent.
 			 */
+			
 			if (w->left->color == BLACK && w->right->color == BLACK){
 				w->color = RED;
 				node = node->parent;
@@ -476,7 +482,7 @@ extern void __LIST_KEYS_SORTED(struct rb_node* node){
 
 
 extern void __PRINT_NODE(struct rb_node* node){
-
+  
 	printf(
 	       "Node: %s, Color: %d, P: %s, LC: %s, RC: %s\n",	\
 	       node->key,
@@ -508,8 +514,8 @@ extern void set(struct rb_tree *tree, char *key, char* data){
 extern bool delete(struct rb_tree *tree, char *key){
 
 	struct rb_node *candidate = rb_search(tree, key);
-	__PRINT_NODE(candidate);
-	if (candidate != SENTINEL()){
+
+	if (candidate != NULL && candidate != SENTINEL()){
 		rb_delete(tree, candidate);
 		rb_free(candidate);
 		return true;
@@ -539,7 +545,7 @@ extern void rb_free(struct rb_node* node){
 
 
 void _print_tree_recursive(struct rb_node* node){
-	if (!node)
+        if (!node || node == SENTINEL())
 		return;
 	__PRINT_NODE(node);
 	_print_tree_recursive(node->left);
@@ -549,30 +555,4 @@ void _print_tree_recursive(struct rb_node* node){
 void _print_tree(struct rb_tree* tree){
 	_print_tree_recursive(tree->root);
 
-}
-
-int main(int argc, char const *argv[])
-{
-	struct rb_tree *tree = rb_tree_alloc();
-	struct rb_node *node;
-	char s[2];
-	s[1] = '\0';
-	for(char c = 'a'; c <= 'z'; ++c){
-		s[0] = c;
-		node = rb_node_alloc_kv(s, s);
-		rb_insert(tree, node);
-	}
-
-	_print_tree(tree);
-
-	char* delete_set[] = {"a", "h", "i", "t", "u", "n"};
-	for (int i = 0; i < 6; i++)
-	{
-		printf("%s\n", delete_set[i]);
-		if (delete(tree, delete_set[i])){
-			_print_tree(tree);
-			node = rb_search(tree, delete_set[i]);
-		}
-	}
-	return 0;
 }

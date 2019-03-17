@@ -13,7 +13,7 @@
    2. Leaf nodes are also sentinel node. 
    3. All RB Tree instances will share this sentinel node for their root's parent and leaves.
    4. Empty root is initialized to sentinel.
-   5. Unsuccessful search (rb_search)  always returns the sentinel node. 
+   5. Unsuccessful search (rb_search) returns NULL. 
    
    Implementation based on CLRS 3rd edition.
 */
@@ -357,7 +357,7 @@ extern struct rb_node* rb_search(struct rb_tree* tree, char* key){
 		node = LESS_THAN(key, node->key) ? node->left : node->right;
 	}
 
-	return node;
+	return node == SENTINEL() ? NULL : node;
 }
 
 
@@ -542,7 +542,6 @@ extern void rb_free(struct rb_node* node){
 	free(node->key);
 	free(node);
 }
-
 
 void _print_tree_recursive(struct rb_node* node){
         if (!node || node == SENTINEL())

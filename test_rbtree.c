@@ -68,7 +68,7 @@ void test_insert_and_delete(){
 	{
 		if (delete(tree, delete_set[i])){
 			node = rb_search(tree, delete_set[i]);
-			TEST_ASSERT_EQUAL(node, tree->root->parent);
+			TEST_ASSERT_EQUAL(node, NULL);
 		}
 	}
 }

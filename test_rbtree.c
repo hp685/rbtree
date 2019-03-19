@@ -1,6 +1,6 @@
 #include "rbtree.h"
 #include "unity.h"
-
+#include <string.h>
 
 void test_rbtree_alloc(){
 	struct rb_tree *tree = rb_tree_alloc();
@@ -77,19 +77,25 @@ void test_a_million_items(){
 	struct rb_tree *tree = rb_tree_alloc();
 	struct rb_node *node;
 	char key[10];
+
 	for(int i = 0; i < 1000000; i++){
-		sprintf(key, "%d\0", i);
+		sprintf(key, "%d", i);
 		node = rb_node_alloc_kv(key, key);
 		rb_insert(tree, node);
 	}
-	printf("Done allocating.");
-	
+
+
 	for(int i = 0; i < 1000000; i++){
-		sprintf(key, "%d\0", i);
+	        sprintf(key, "%d", i);
 		node = rb_search(tree, key);
 		TEST_ASSERT_EQUAL_STRING(node->key, key);
 		TEST_ASSERT_EQUAL_STRING(node->data, key);
-		TEST_ASSERT_EQUAL(delete(tree, key), true);
+	}
+
+	for (int i = 0; i < 1000000; i++){
+	  memset(key, 0, sizeof(key));
+	  sprintf(key, "%d", i);
+	  TEST_ASSERT_EQUAL(delete(tree, key), true);
 	}
 }
 

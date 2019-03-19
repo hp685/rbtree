@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -I ./unity/src/  -std=c99
+CFLAGS= -I ./unity/src/  -std=c99 -ggdb
 TFLAGS= ./unity/src/unity.c
 
 test: test_rbtree

@@ -157,7 +157,7 @@ void rb_insert_fixup(struct rb_tree* tree, struct rb_node* node){
 
 	struct rb_node* y;
 
-	while (node->parent != SENTINEL() && node->parent->color == RED){
+	while (node->parent->color == RED){
 		if (node->parent == node->parent->parent->left){
 			y = node->parent->parent->right;
 			/*case 1: node's uncle y is red*/
@@ -169,16 +169,18 @@ void rb_insert_fixup(struct rb_tree* tree, struct rb_node* node){
 				node = node->parent->parent;
 			}
 			/*case 2: node's uncle y is black and node is a right child*/
-			else if (node == node->parent->right){
+			else{
+			  if (node == node->parent->right){
 				/*left rotate parent*/
 				node = node->parent;
 				left_rotate(tree, node);
-			}
+			  }
 
 			/*case 3: node's uncle y is black and node is a left child*/
 			node->parent->color = BLACK;
 			node->parent->parent->color = RED;
 			right_rotate(tree, node->parent->parent);
+			}
 					
 		}
 		else {
@@ -264,7 +266,7 @@ extern struct rb_node* rb_delete(struct rb_tree* tree, struct rb_node* node){
 		y->left->parent = y;
 		y->color = node->color;
 	}
-	if (y_original_color == BLACK){
+	if (y_original_color == BLACK && x != SENTINEL()){
 		rb_delete_fixup(tree, x);
 	}
 
@@ -276,7 +278,6 @@ void rb_delete_fixup(struct rb_tree *tree, struct rb_node *node){
 
 	struct rb_node *x, *w;
 
-	
 	while (node != tree->root && node->color == BLACK){
 		if (node == node->parent->left){
 			w = node->parent->right;
@@ -299,21 +300,23 @@ void rb_delete_fixup(struct rb_tree *tree, struct rb_node *node){
 			/*case 3: node's sibling is black. Siblings left child is red, 
 			  and right child is black. Switch colors of sibling and its left child
 			  and perform right rotate on sibling.*/
-			else if (w->right->color == BLACK){
+			else {
+			  if (w->right->color == BLACK){
 				w->left->color = BLACK;
 				w->color = RED;
 				right_rotate(tree, w);
 				w = node->parent->right;
-			}
+			  }
 			/*case 4: sibling is black and its right child is red.
 			  Make siblings right black and nodes paren't black.
 			  Sibling gets the same color as parent. Perform left rotate on parent.
 			 */
-			w->color = node->parent->color;
-			node->parent->color = BLACK;
-			w->right->color = BLACK;
-			left_rotate(tree, node->parent);
-			node = tree->root;
+			  w->color = node->parent->color;
+			  node->parent->color = BLACK;
+			  w->right->color = BLACK;
+			  left_rotate(tree, node->parent);
+			  node = tree->root;
+			}
 		}
 		else {
 			/*Symmetric case where node is parent's right child.*/
@@ -322,24 +325,26 @@ void rb_delete_fixup(struct rb_tree *tree, struct rb_node *node){
 				w->color = BLACK;
 				node->parent->color = RED;
 				right_rotate(tree, node->parent);
-				w = node->parent->right;
+				w = node->parent->left;
 			}
 			if (w->left->color == BLACK && w->right->color == BLACK){
 				w->color = RED;
 				node = node->parent;
 			}
-			else if (w->right->color == BLACK){
-				w->left->color = BLACK;
+			else {
+			  if (w->left->color == BLACK){
+				w->right->color = BLACK;
 				w->color = RED;
 				left_rotate(tree, w);
-				w = node->parent->right;
-			}
+				w = node->parent->left;
+			  }
 
 			w->color = node->parent->color;
 			node->parent->color = BLACK;
-			w->right->color = BLACK;
+			w->left->color = BLACK;
 			right_rotate(tree, node->parent);
 			node = tree->root;
+			}
 		}
 	}
 	node->color = BLACK;
@@ -444,7 +449,6 @@ extern struct rb_node* rb_node_alloc_kv(char* key, char* value){
 extern bool LESS_THAN(char *a, char *b){
 
 	size_t i, j;
-	
 	if (strlen(a) < strlen(b)) return true;
 	else if(strlen(a) > strlen(b)) return false;
 
@@ -511,7 +515,6 @@ extern void set(struct rb_tree *tree, char *key, char* data){
 
 
 extern bool delete(struct rb_tree *tree, char *key){
-
 	struct rb_node *candidate = rb_search(tree, key);
 
 	if (candidate != NULL && candidate != SENTINEL()){

@@ -73,6 +73,26 @@ void test_insert_and_delete(){
 	}
 }
 
+void test_a_million_items(){
+	struct rb_tree *tree = rb_tree_alloc();
+	struct rb_node *node;
+	char key[10];
+	for(int i = 0; i < 1000000; i++){
+		sprintf(key, "%d\0", i);
+		node = rb_node_alloc_kv(key, key);
+		rb_insert(tree, node);
+	}
+	printf("Done allocating.");
+	
+	for(int i = 0; i < 1000000; i++){
+		sprintf(key, "%d\0", i);
+		node = rb_search(tree, key);
+		TEST_ASSERT_EQUAL_STRING(node->key, key);
+		TEST_ASSERT_EQUAL_STRING(node->data, key);
+		TEST_ASSERT_EQUAL(delete(tree, key), true);
+	}
+}
+
 
 int main(int argc, char const *argv[])
 {
@@ -81,6 +101,7 @@ int main(int argc, char const *argv[])
 	RUN_TEST(test_insert_and_retrieve);
 	RUN_TEST(test_check_ordering);
 	RUN_TEST(test_insert_and_delete);
+	RUN_TEST(test_a_million_items);
 	UNITY_END();
 
 	return 0;

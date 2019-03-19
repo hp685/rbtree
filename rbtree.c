@@ -322,24 +322,23 @@ void rb_delete_fixup(struct rb_tree *tree, struct rb_node *node){
 				w->color = BLACK;
 				node->parent->color = RED;
 				right_rotate(tree, node->parent);
-				w = node->parent->left;
+				w = node->parent->right;
 			}
-			if (w->left->color == BLACK &&\
-			    w->right->color == BLACK){
+			if (w->left->color == BLACK && w->right->color == BLACK){
 				w->color = RED;
 				node = node->parent;
 			}
-			else if (w->left->color == BLACK){
-				w->right->color = BLACK;
+			else if (w->right->color == BLACK){
+				w->left->color = BLACK;
 				w->color = RED;
 				left_rotate(tree, w);
-				w = node->parent->left;
+				w = node->parent->right;
 			}
 
 			w->color = node->parent->color;
 			node->parent->color = BLACK;
 			w->right->color = BLACK;
-			right_rotate(tree, x->parent);
+			right_rotate(tree, node->parent);
 			node = tree->root;
 		}
 	}

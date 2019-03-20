@@ -131,7 +131,7 @@ extern void rb_insert(struct rb_tree *tree, struct rb_node *node){
 	/*traverse down the tree to find the insertion point*/
 	while (x != SENTINEL()){
 		y = x;
-		x = (LESS_THAN(node->key, x->key)) ? x->left : x->right;
+		x = (LESS_THAN(node->key, x->key, STRING_LESS_THAN)) ? x->left : x->right;
 	}
 	node->parent = y;
 
@@ -139,7 +139,7 @@ extern void rb_insert(struct rb_tree *tree, struct rb_node *node){
 	if (y == SENTINEL()){
 		tree->root = node;
 	}
-	else if (LESS_THAN(node->key, y->key)){
+	else if (LESS_THAN(node->key, y->key, STRING_LESS_THAN)){
 		y->left = node;  
 	}
 	else {
@@ -356,9 +356,9 @@ extern struct rb_node* rb_search(struct rb_tree* tree, char* key){
 	struct rb_node* node = tree->root;
 	
 	while (node != SENTINEL() &&\
-	       NOT_EQUAL(node->key, key)){
+	       NOT_EQUAL(node->key, key, STRING_NOT_EQUAL)){
 
-		node = LESS_THAN(key, node->key) ? node->left : node->right;
+		node = LESS_THAN(key, node->key, STRING_LESS_THAN) ? node->left : node->right;
 	}
 
 	return node == SENTINEL() ? NULL : node;
@@ -446,8 +446,19 @@ extern struct rb_node* rb_node_alloc_kv(char* key, char* value){
 }
 
 
-extern bool LESS_THAN(char *a, char *b){
+extern bool LESS_THAN(void *a, void *b, bool (*comparator)(void* , void* )){
+	return comparator(a, b);
+}
 
+
+extern bool  NOT_EQUAL(void *a, void *b, bool(*comparator)(void*, void*)){
+	return comparator(a, b);
+}
+
+
+extern bool STRING_LESS_THAN(void *A, void *B){
+	char* a = A;
+	char* b = B;
 	size_t i, j;
 	if (strlen(a) < strlen(b)) return true;
 	else if(strlen(a) > strlen(b)) return false;
@@ -460,8 +471,9 @@ extern bool LESS_THAN(char *a, char *b){
 }
 
 
-extern bool NOT_EQUAL(char *a, char *b){
-
+extern bool STRING_NOT_EQUAL(void *A, void *B){
+	char* a = A;
+	char* b = B;
 	size_t i, j;
 
 	if (strlen(a) != strlen(b))

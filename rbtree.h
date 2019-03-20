@@ -6,13 +6,15 @@ struct rb_node{
 	struct rb_node* parent;
 	struct rb_node* left;
 	struct rb_node* right;
-	char* key;
-	char* data;
+	void* key;
+	void* data;
 	unsigned int color:1;
 };
 
 struct rb_tree{
 	struct rb_node* root;
+	unsigned int keyType;
+	unsigned int dataType;
 };
 
 struct rb_node* SENTINEL();
@@ -54,11 +56,11 @@ struct rb_node* rb_node_alloc_kv(char*, char*);
 struct rb_node* search(struct rb_tree*, struct rb_node*);
 
 
-/* To be defined by user of this library.*/
+/* Comparison operators for other types to be defined by caller.*/
 
-extern bool LESS_THAN(char* , char*);
+extern bool LESS_THAN(void* , void*, bool (*comparator)(void* , void* ));
 
-extern bool NOT_EQUAL(char*, char*);
+extern bool NOT_EQUAL(void*, void*, bool (*comparator)(void* , void* ));
 
 extern void set(struct rb_tree*, char*, char*);
 
@@ -67,3 +69,12 @@ extern bool delete(struct rb_tree*, char*);
 extern bool is_member(struct rb_tree*, char*);
 
 extern void rb_free(struct rb_node*);
+
+
+extern bool STRING_LESS_THAN(void*, void*);
+
+extern bool INT_LESS_THAN(void*, void*);
+
+extern bool STRING_NOT_EQUAL(void*, void*);
+
+extern bool INT_NOT_EQUAL(void*, void*);
